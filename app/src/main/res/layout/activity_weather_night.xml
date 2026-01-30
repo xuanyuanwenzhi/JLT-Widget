@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  天气场景布局（夜晚/月亮版）
+  结构和你白天/雾霾那套一致：上方 320dp 舞台放图，下方语录框淡入。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      垂直堆叠：舞台（图）在上，语录框在下
+      - layout_gravity=center：整体居中
+      - gravity=center_horizontal：子元素按中线对齐
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!--
+          舞台区域：固定尺寸，保证素材在不同机型上观感一致
+          - clipChildren/clipToPadding=false：如果后续月亮要做位移/缩放，不会被裁切
+        -->
+        <FrameLayout
+            android:id="@+id/weather_stage"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              月亮主图
+              - src：夜晚动图/静图资源（这里是 weather_anim_moon）
+              - scaleType=fitCenter：保持原图比例
+              - contentDescription=@null：装饰图，不需要无障碍朗读
+            -->
+            <ImageView
+                android:id="@+id/img_moon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/weather_anim_moon"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          语录框
+          - 固定宽 260dp：避免文案长短导致布局跳动
+          - maxLines=2：最多两行，超出用省略号
+          - alpha=0：默认透明，通常由代码做淡入动画
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+</FrameLayout>

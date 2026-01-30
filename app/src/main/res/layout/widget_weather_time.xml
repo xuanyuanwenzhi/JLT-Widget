@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  天气小组件布局（AppWidget RemoteViews）
+  结构很简单：外层留一点安全边距，里面是一张圆角卡片，卡片里铺满一张天气图。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <!--
+      卡片容器：
+      - match_parent：尽量铺满 widget，圆角效果更稳定
+      - weather_bg_sky：卡片背景（天空底图/渐变等）
+      - clipToOutline=true：将内部内容裁剪到圆角轮廓（前提是 background 定义了 outline/shape）
+      - padding=8dp：让内容不要紧贴边缘
+    -->
+    <FrameLayout
+        android:id="@+id/card_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/weather_bg_sky"
+        android:clipToOutline="true"
+        android:padding="8dp">
+
+        <!--
+          天气图标（主内容）：
+          - match_parent：铺满卡片内容区域（减去 padding 后的区域）
+          - fitCenter：保持比例，不拉伸
+          - src 默认 day：逻辑层会根据 mode/dayKind 动态 setImageViewResource 替换
+          - contentDescription=null：装饰图，不需要无障碍朗读
+        -->
+        <ImageView
+            android:id="@+id/img_weather"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/weather_widget_day"
+            android:contentDescription="@null" />
+
+    </FrameLayout>
+
+</FrameLayout>

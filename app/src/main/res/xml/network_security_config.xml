@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- ✅ 只允许 apis.juhe.cn 走 http 明文 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">apis.juhe.cn</domain>
+    </domain-config>
+</network-security-config>

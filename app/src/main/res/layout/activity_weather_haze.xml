@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  天气场景布局（雾霾/通用单图版）
+  目标：
+  1) 透明背景的 Activity 上居中显示内容
+  2) 上方 320dp 舞台放主图（雾霾图/雨图/白天图都能复用）
+  3) 下方是语录框（两行、居中、默认透明由代码淡入）
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      ✅ 居中竖排容器：上图下文
+      - wrap_content：让整体尺寸跟内容一致，避免撑满导致对齐/点击区域不好控
+      - layout_gravity=center：把整块内容放在屏幕正中
+      - gravity=center_horizontal：确保内部舞台和语录框横向对齐在同一中线
+      - clipChildren/clipToPadding=false：允许舞台里的元素做轻微位移时不被裁切
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!--
+          舞台（主图容器）
+          - 固定 320dp：保证不同机型上素材显示比例一致
+          - FrameLayout：后续如果要叠加额外层（比如粒子/前景遮罩）也方便
+          - clipChildren/clipToPadding=false：避免动画或位移时被父容器裁切
+        -->
+        <FrameLayout
+            android:id="@+id/weather_stage"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              主图 ImageView
+              - match_parent：填满舞台，方便直接替换不同天气的 drawable
+              - scaleType=fitCenter：保持原图比例，不裁剪
+              - contentDescription=@null：纯装饰图，不需要无障碍朗读
+            -->
+            <ImageView
+                android:id="@+id/img_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          ✅ 语录框（与其它页面统一风格）
+          - 宽 260dp：避免文本长短导致宽度跳动；两行显示更稳定
+          - background=@drawable/weather_quote_bg：米黄色底
+          - textColor=#7EC6FF：淡蓝色字
+          - maxLines=2 + ellipsize=end：超长截断，避免把布局撑太高
+          - includeFontPadding=false：更贴近视觉居中（少掉字体默认上下留白）
+          - alpha=0：默认透明，通常由代码 ObjectAnimator 做淡入
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+</FrameLayout>

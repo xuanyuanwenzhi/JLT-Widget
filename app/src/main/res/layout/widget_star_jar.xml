@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  星星瓶小组件布局（AppWidget RemoteViews）
+  目标：卡片铺满 + 内容垂直居中；上方显示瓶子图标，下方可选显示祝福文案
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <!--
+      圆角卡片容器：
+      - match_parent：尽量铺满 widget，2x2/4x2 时圆角更稳定可见
+      - widget_bg_round：负责圆角/底色（以及你可能做的阴影效果）
+      - clipToOutline=true：把内部内容裁剪到圆角轮廓里
+      - padding=8dp：卡片内边距，避免内容贴边
+    -->
+    <FrameLayout
+        android:id="@+id/card_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_bg_round"
+        android:clipToOutline="true"
+        android:padding="8dp">
+
+        <!--
+          内容组（上图下字）：
+          - orientation=vertical：竖排
+          - gravity=center：整体在卡片中垂直/水平居中，减少底部空白观感
+        -->
+        <LinearLayout
+            android:id="@+id/content_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!--
+              星星瓶图标：
+              - 固定 84dp：在常见 widget 尺寸下比较稳
+              - fitCenter：保持比例不拉伸
+              - contentDescription=null：纯装饰图，无障碍不朗读
+              - src 默认 idle：逻辑层可根据状态切换到别的资源
+            -->
+            <ImageView
+                android:id="@+id/img_jar"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:src="@drawable/star_widget_jar_idle"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+
+            <!--
+              祝福文案：
+              - 默认 gone：不显示时完全不占空间（避免把图标顶上去）
+              - 单行 + ellipsize：防止文案过长撑破布局
+              - includeFontPadding=false：去掉字体上下默认留白，让视觉更紧凑
+              - 居中：gravity/textAlignment=center
+            -->
+            <TextView
+                android:id="@+id/txt_bless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#8B5A2B"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

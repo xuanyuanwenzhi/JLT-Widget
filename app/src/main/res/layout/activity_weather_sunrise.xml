@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  晴天/白天场景布局（太阳 + 草地 + 语录）
+  结构：整体居中竖排，上面 360dp 舞台，下面语录框
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      主内容竖排容器：
+      - layout_gravity=center：整块内容居中
+      - gravity=center_horizontal：子元素水平居中
+      这里没写 clipChildren/clipToPadding，但父容器是 false，一般也够用；
+      如果后续做位移动画超出范围，再把这俩也设为 false。
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!--
+          动画舞台：
+          - 360dp：给太阳/草地留出画面空间
+          - clipChildren/clipToPadding=false：允许图片做位移/放大时不被裁剪
+        -->
+        <FrameLayout
+            android:id="@+id/weather_stage"
+            android:layout_width="360dp"
+            android:layout_height="360dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              太阳：
+              - 340dp：比舞台稍小，留一点边缘空白
+              - 居中显示，fitCenter 保持比例
+              - src 写死在 XML：默认就是太阳图
+            -->
+            <ImageView
+                android:id="@+id/img_sun"
+                android:layout_width="340dp"
+                android:layout_height="340dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/weather_anim_sun"
+                android:contentDescription="@null" />
+
+            <!--
+              草地：
+              - 420dp 宽：故意比舞台更宽，保证底部铺满且有“延伸感”
+              - bottom|center_horizontal：贴底并水平居中
+              - marginBottom=-10dp：轻微下移，避免底部露出空隙/让草更贴边
+              - fitXY：允许拉伸铺满（草地一般不怕被拉）
+            -->
+            <ImageView
+                android:id="@+id/img_grass"
+                android:layout_width="420dp"
+                android:layout_height="280dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="-10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/weather_anim_grass"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          语录框（统一样式）：
+          - alpha=0：初始透明，Activity 里做淡入
+          - 两行省略：避免长文案撑爆布局
+          - 背景 weather_quote_bg：米黄色底（你其他页面一致）
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+</FrameLayout>

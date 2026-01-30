@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  天气场景通用布局（以“日间/太阳+云”为例）
+  布局目标：
+  1) 整体居中显示（适合做透明 Activity 的弹层动画）
+  2) 上方是 320dp 的动画舞台（太阳/云等叠层）
+  3) 下方是语录条（两行、居中、淡入）
+  注：
+  - 这里很多属性看起来“重复”，但在动画场景里是刻意固定的：保证构图稳定、不同机型不乱跑。
+  - clipChildren/clipToPadding=false：允许动画元素超出父容器边界（比如云上下浮动）。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      居中竖排容器（Stack）
+      - wrap_content：内容有多大就占多大，避免撑满全屏导致点击区域/对齐不直观
+      - layout_gravity=center：把整个“动画+语录条”作为一个整体放到屏幕正中
+      - orientation=vertical：上动画、下文字
+      - gravity=center_horizontal：确保子元素横向居中对齐（舞台和文字框都在同一中线）
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!--
+          动画舞台（Stage）
+          - 固定 320dp：保证素材比例一致（你所有天气动画 Activity 基本都用这个舞台尺寸）
+          - clipChildren/clipToPadding=false：允许内部 ImageView 做位移/漂浮时不被裁切
+          - FrameLayout：用“叠层”方式摆放素材（太阳、云等），顺序决定层级
+        -->
+        <FrameLayout
+            android:id="@+id/weather_stage"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              太阳层（底层/背景层）
+              - match_parent：填满舞台，方便用同一套素材基准
+              - scaleType=fitCenter：保持原图比例，不裁剪（构图完整）
+              - contentDescription=@null：纯装饰，无需无障碍朗读
+            -->
+            <ImageView
+                android:id="@+id/img_sun"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/weather_anim_sun"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+
+            <!--
+              云层（覆盖在太阳上）
+              - translationY=32dp：初始向下偏移一点，营造“云在下方飘过”的构图
+                （这是一个视觉魔法数：改动会影响云与太阳的相对位置）
+              - 同样 match_parent + fitCenter：保证与舞台对齐，不随内容大小漂移
+            -->
+            <ImageView
+                android:id="@+id/img_cloud"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/weather_anim_cloud"
+                android:scaleType="fitCenter"
+                android:translationY="32dp"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          语录条（Quote）
+          - 放在舞台下方：layout_marginTop=10dp 给一点呼吸空间
+          - 宽度固定 260dp：保证两行文本换行/省略稳定，不会因为字少/字多导致宽度跳变
+          - background=@drawable/weather_quote_bg：米黄色底（你自定义 drawable）
+          - textColor=#7EC6FF：淡蓝色字（和整体清爽风格一致）
+          - maxLines=2 + ellipsize=end：文案过长时截断，避免撑高布局影响构图
+          - includeFontPadding=false：减少字体上下内边距，使视觉更居中、更“贴底板”
+          - alpha=0：默认透明，通常由代码 ObjectAnimator 淡入
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+</FrameLayout>

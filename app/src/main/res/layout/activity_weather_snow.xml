@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  雪天场景布局（雪人 + 语录 + 全屏雪花覆盖层）
+  关键点：snow_overlay 放在最下面（XML 最后）= 绘制层级最高，用来让雪花飘过语录条
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      主内容竖排：上面舞台（雪人），下面语录框
+      - layout_gravity=center：整体居中
+      - gravity=center_horizontal：子元素水平居中
+      - clipChildren/clipToPadding=false：为动画/位移留空间
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!--
+          舞台：只放雪人主图
+          - 360dp：比常规 320dp 稍大一点，画面更“饱满”
+          - id=root_snow：给 Activity 找到舞台范围用（雪花另有 overlay）
+        -->
+        <FrameLayout
+            android:id="@+id/root_snow"
+            android:layout_width="360dp"
+            android:layout_height="360dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              雪人主图（由 Activity 动态 setImageResource）
+              - 220dp：主体尺寸
+              - layout_gravity=center：舞台中心
+              - scaleType=fitCenter：保持比例不拉伸
+            -->
+            <ImageView
+                android:id="@+id/img_snowman"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          语录框（统一样式）
+          - alpha=0：初始透明，代码里做淡入
+          - maxLines=2：最多两行，超出省略
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+    <!--
+      雪花覆盖层：全屏 FrameLayout
+      - 放在 XML 最后 => 绘制在最上层（覆盖雪人和语录）
+      - Activity 里动态 addView(ImageView) 往这里塞雪花
+      - clickable/focusable=false：不抢触摸/焦点，避免影响关闭或点击逻辑
+    -->
+    <FrameLayout
+        android:id="@+id/snow_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:clickable="false"
+        android:focusable="false" />
+
+</FrameLayout>

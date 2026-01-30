@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      允许联网请求天气/接口。
+      NOTE: 如果以后增加 WorkManager 后台更新、图片/文本接口等，也都依赖这个权限。
+    -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+    <!--
+      App 主入口（桌面图标点开进来的 Activity）
+      exported=true 是因为有 LAUNCHER intent-filter（Android 12+ 强制要求显式声明）。
+    -->
+    <activity
+        android:name=".MainActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+
+    <!--
+      两个动画展示页：
+      - 透明主题：只覆盖在桌面上展示动画效果
+      - excludeFromRecents：不出现在最近任务
+      - finishOnTaskLaunch + taskAffinity=""：避免形成新的任务栈，尽量“点开-播放-结束”
+      NOTE: 如果遇到模拟器黑屏/闪烁，透明 Activity + GPU 加速可能是诱因之一（但不一定）。
+    -->
+    <activity
+        android:name=".FortuneAnimActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <activity
+        android:name=".StarAnimActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <!--
+      桌面小组件：FortuneBambooWidget
+      Receiver 用于接收系统的 APPWIDGET_UPDATE 广播。
+      exported=false：只允许系统/本应用触发（更安全）。
+      meta-data 指向 widget provider 信息（大小/刷新周期/布局等）。
+    -->
+    <receiver
+        android:name=".FortuneBambooWidget"
+        android:exported="false"
+        android:label="@string/widget_bamboo_name">
+        <intent-filter>
+            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        </intent-filter>
+        <meta-data
+            android:name="android.appwidget.provider"
+            android:resource="@xml/fortune_bamboo_widget_info" />
+    </receiver>
+
+    <!-- 桌面小组件：StarJarWidget -->
+    <receiver
+        android:name=".StarJarWidget"
+        android:exported="false"
+        android:label="@string/widget_star_jar_name">
+        <intent-filter>
+            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        </intent-filter>
+        <meta-data
+            android:name="android.appwidget.provider"
+            android:resource="@xml/star_jar_widget_info" />
+    </receiver>
+
+    <!--
+      Weather 系列透明展示页：
+      逻辑：点击 WeatherTimeWidget -> 根据时间/缓存/调试场景 跳转到不同 Activity
+      统一特征：
+      - 透明主题：像“桌面特效覆盖层”
+      - 不进最近任务 + 不形成独立 taskAffinity：减少“打开后回不去/多任务堆积”
+    -->
+
+    <activity
+        android:name=".WeatherSunriseActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <activity
+        android:name=".WeatherDayActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <activity
+        android:name=".WeatherNightActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <!-- WeatherTimeWidget：桌面天气/时间小组件 -->
+    <receiver
+        android:name=".WeatherTimeWidget"
+        android:exported="false"
+        android:label="@string/widget_weather_time_name">
+        <intent-filter>
+            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        </intent-filter>
+        <meta-data
+            android:name="android.appwidget.provider"
+            android:resource="@xml/weather_time_widget_info" />
+    </receiver>
+
+    <!-- 开发者说明页（不需要透明/不需要 noHistory） -->
+    <activity
+        android:name=".DeveloperNoteActivity"
+        android:exported="false" />
+
+    <!--
+      天气细分场景页：
+      noHistory=true：进入后按返回不会留在栈里（更像一次性特效页）
+      NOTE: 如果你希望“看完还能返回到上一个天气页”，就不要 noHistory。
+    -->
+
+    <activity
+        android:name=".WeatherHazeActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:noHistory="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <activity
+        android:name=".WeatherRainActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:noHistory="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <activity
+        android:name=".WeatherSnowActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:noHistory="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <activity
+        android:name=".WeatherWindActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:finishOnTaskLaunch="true"
+        android:noHistory="true"
+        android:taskAffinity=""
+        android:theme="@style/Theme.MyApplication.Transparent" />
+
+    <!-- 调试页：控制调试场景、查看缓存、测试接口等 -->
+    <activity
+        android:name=".WeatherDebugActivity"
+        android:exported="false" />
+
+    <!-- 天气数据源设置页：选择 WTTR / WTTR_V2 / JUHE，填 Key，测试与复制缓存 -->
+    <activity
+        android:name=".WeatherSourceSettingsActivity"
+        android:exported="false" />
+
+</application>
+
+    </manifest>

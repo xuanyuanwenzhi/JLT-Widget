@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  竹子签/运势类小组件布局（AppWidget RemoteViews）
+  目标：在 2x2 尺寸下也能稳定显示“圆角卡片 + 居中内容”
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <!--
+      卡片容器：
+      - match_parent：尽量铺满 widget 区域，避免小组件尺寸变化时圆角不明显
+      - background：widget_bg_round 负责圆角/底色/阴影（如果你做了）
+      - clipToOutline=true：配合 background 的 outline，把内部内容裁到圆角里
+      - padding=8dp：给内容留出内边距，看起来更像“卡片”
+    -->
+    <FrameLayout
+        android:id="@+id/card_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_bg_round"
+        android:clipToOutline="true"
+        android:padding="8dp">
+
+        <!--
+          内容组：
+          - 用 LinearLayout 竖排：上图下字
+          - gravity=center：整体居中，减少“下方空一大截”的观感
+          - match_parent：让居中对齐基于整张卡片高度生效
+        -->
+        <LinearLayout
+            android:id="@+id/content_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!--
+              竹子主图：
+              - 固定 84dp：在常见 2x2/4x2 下都比较稳
+              - fitCenter：保持比例，不强行拉伸
+              - contentDescription=null：纯装饰图（无障碍不读）
+            -->
+            <ImageView
+                android:id="@+id/img_bamboo"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:src="@drawable/fortune_bamboo"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+
+            <!--
+              运势文本：
+              - 默认 gone：如果某些场景不想显示文案就完全不占位
+              - singleLine/maxLines=1 + ellipsize=end：防止文字过长撑破布局
+              - includeFontPadding=false：减少字体上下默认留白，让垂直居中更贴合
+              - textAlignment/ gravity=center：居中显示
+            -->
+            <TextView
+                android:id="@+id/txt_fortune"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#8B5A2B"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  星星许愿/祝福动画布局（Star Scene）
+  目标：用一个“舞台 FrameLayout”叠放多层素材，通过 alpha/位移/旋转动画实现：
+  1) 瓶子作为底图（根据状态切换 3stars/2stars 等）
+  2) 星星从瓶子附近出现，旋转并渐隐
+  3) 拖尾从右侧飞入并淡入
+  4) 文案在拖尾上显示，并用“双层 TextView”制造伪描边/阴影（更清晰、更像贴纸）
+  注：
+  - 本文件大量属性看似重复（layout_width/height、gravity、alpha 等），这是 UI 布局常态；
+    注释只解释“为什么这样叠/为什么这些魔法数存在”，避免以后自己或别人随手改崩。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/star_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      舞台（Stage）：
+      - 全部动画元素叠在同一个 FrameLayout 上
+      - 叠层顺序由 XML 声明顺序决定：先声明的在底层，后声明的在上层
+      - 固定 320dp：保证构图一致（不同屏幕密度下视觉比例稳定）
+      - clipChildren/clipToPadding=false：允许动画元素“飞出舞台边界”（比如拖尾更宽、更大）
+    -->
+    <FrameLayout
+        android:id="@+id/star_stage"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:layout_gravity="center"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!--
+          瓶子（底图层 / Base Layer）
+          - 不在 XML 固定 src：由代码根据状态设置（例如：先 3stars 再切 2stars）
+          - 放在最底层：保证拖尾/飞星/文字都在瓶子上层显示
+          - scaleType=fitCenter：保持瓶子图案完整，不裁剪
+          - contentDescription=@null：纯装饰性图片，无需无障碍朗读（避免读出“Image”之类）
+        -->
+        <ImageView
+            android:id="@+id/img_star_jar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="@null" />
+
+        <!--
+          旋转渐隐的星星（Flying Star）
+          - 初始 alpha=0：由代码控制淡入/旋转/淡出
+          - gravity=top|center_horizontal：以舞台顶部为参照，再用 marginTop 定位到瓶子口附近
+          - marginTop=90dp：视觉魔法数（对齐瓶子口/中心位置），改动会影响“从瓶子里飞出”的感觉
+          - 放在瓶子上层：星星应当飞在瓶子前面
+        -->
+        <ImageView
+            android:id="@+id/img_fly_star"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="90dp"
+            android:alpha="0"
+            android:src="@drawable/star"
+            android:scaleType="fitCenter"
+            android:contentDescription="@null" />
+
+        <!--
+          拖尾（Star Trail）
+          - 初始 alpha=0：动画飞入时淡入
+          - layout_width=380dp > 舞台 320dp：故意更宽，让拖尾有“从外面飞进来”的空间
+          - scaleType=fitXY：允许拖尾被拉伸，保证拖尾能铺满指定区域（视觉效果优先）
+          - gravity=center：以舞台中心定位，方便代码做 translationX/translationY 的飞入
+          - 放在瓶子上层：拖尾应覆盖在瓶子前面（否则像在瓶子后面飞）
+        -->
+        <ImageView
+            android:id="@+id/img_star_trail"
+            android:layout_width="380dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center"
+            android:alpha="0"
+            android:src="@drawable/star_anim_star_trail"
+            android:scaleType="fitXY"
+            android:contentDescription="@null" />
+
+        <!--
+          文案层（Bless Text Layer）
+          - 单独用一个 FrameLayout 包裹两层 TextView：下层“阴影/描边”，上层“正文”
+          - 这样做比 setShadowLayer 更可控：颜色/偏移/透明度/动画都能分别调
+          - 固定 220x90dp：保证两行文本在拖尾上的占位稳定（避免不同机型换行抖动）
+          - 放在拖尾上层：文字必须压在拖尾之上
+        -->
+        <FrameLayout
+            android:id="@+id/bless_text_layer"
+            android:layout_width="220dp"
+            android:layout_height="90dp"
+            android:layout_gravity="center"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              阴影层（Shadow Layer）
+              - alpha=0：由代码统一控制淡入淡出（通常和正文一起出现）
+              - translationX/Y=1dp：轻微右下偏移，模拟“阴影/描边”效果
+              - textColor 深色：作为底层轮廓，提升亮色正文在复杂背景上的可读性
+              - maxLines=2 + ellipsize=end：防止长文案撑破拖尾区域
+              - includeFontPadding=false：减少字体默认上下留白，更贴合视觉中心
+            -->
+            <TextView
+                android:id="@+id/txt_blessing_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:includeFontPadding="false"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#7A4A00"
+                android:translationX="1dp"
+                android:translationY="1dp" />
+
+            <!--
+              正文层（Main Text）
+              - alpha=0：由代码做淡入/淡出（一般和拖尾同步）
+              - 颜色偏亮（金色）：贴合拖尾主题，同时依赖下层阴影保证可读性
+              - 属性尽量与阴影层一致：确保两层文字完全重合（除了阴影偏移）
+            -->
+            <TextView
+                android:id="@+id/txt_blessing_on_trail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:includeFontPadding="false"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFD35A" />
+        </FrameLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

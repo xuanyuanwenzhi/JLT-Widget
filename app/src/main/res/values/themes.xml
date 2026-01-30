@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 你的主主题：如果你项目里已经有这个，就保留；没有的话，用下面第3步我教你检查并修正名字 -->
+    <style name="Theme.MyApplication" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- 透明动画 Activity 的主题（不用 Material3，避免你再炸） -->
+
+
+    <style name="Theme.MyApplication.Transparent" parent="Theme.MyApplication">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- 让内容可以铺到系统栏区域 -->
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+
+
+</resources>

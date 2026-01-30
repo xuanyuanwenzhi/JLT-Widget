@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  大风/龙卷风场景布局
+  思路：舞台里放两张同尺寸 ImageView（A/B），Activity 里交替淡入淡出做 cross-fade 帧动画
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      主内容竖排容器：上面风舞台，下面语录框
+      - clipChildren/clipToPadding=false：防止动画元素位移/放大时被裁剪
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!--
+          风舞台：
+          - 360dp：给风动画留出空间
+          - 内部叠两层 img_a/img_b：交替显示不同帧（tornado_01~04）
+          - 之所以用两张图：避免同一张图频繁 setImageResource 时出现闪烁，同时更方便做交叉淡入淡出
+        -->
+        <FrameLayout
+            android:id="@+id/wind_stage"
+            android:layout_width="360dp"
+            android:layout_height="360dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              图层 A：默认可见（alpha=1）
+              - 220dp：风图主体尺寸
+              - 居中显示，fitCenter 保持比例
+            -->
+            <ImageView
+                android:id="@+id/img_a"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:alpha="1"
+                android:contentDescription="@null" />
+
+            <!--
+              图层 B：默认隐藏（alpha=0）
+              Activity 会在每帧：
+              - 给 next 图层 setImageResource
+              - 同步做 A fadeOut + B fadeIn
+            -->
+            <ImageView
+                android:id="@+id/img_b"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:alpha="0"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          语录框（统一样式）：
+          - alpha=0：初始透明，Activity 里淡入
+          - 两行省略：避免长句撑爆布局
+          - 背景 weather_quote_bg：米黄色底（和其他天气页一致）
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  天气场景通用布局（单图居中版）
+  用途：雨/雪/风/雾霾等“只有一张主图”的页面
+  结构：上方 320dp 舞台放主图，下方语录框（代码里做淡入）
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/weather_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!--
+      垂直堆叠容器：舞台在上，语录在下
+      - wrap_content：整体按内容大小
+      - layout_gravity=center：整个 stack 居中放置
+      - gravity=center_horizontal：子元素水平居中对齐
+    -->
+    <LinearLayout
+        android:id="@+id/weather_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!--
+          舞台区域：固定 320dp
+          - clipChildren/clipToPadding=false：方便主图做位移/缩放时不被裁切
+        -->
+        <FrameLayout
+            android:id="@+id/weather_stage"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!--
+              主图（由 Activity 动态 setImageResource）
+              - 220dp：比舞台小一圈，留出呼吸感
+              - layout_gravity=center：在舞台正中
+              - scaleType=fitCenter：保持比例，不拉伸
+              - contentDescription=@null：装饰图，不需要无障碍朗读
+            -->
+            <ImageView
+                android:id="@+id/img_main"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!--
+          语录框（统一样式）
+          - width=260dp：固定宽避免抖动
+          - maxLines=2：最多两行，超出省略
+          - includeFontPadding=false：去掉 TextView 默认上下留白，视觉更紧凑
+          - alpha=0：初始透明，通常由代码做淡入动画（ObjectAnimator alpha 0->1）
+        -->
+        <TextView
+            android:id="@+id/txt_quote"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/weather_quote_bg"
+            android:textColor="#7EC6FF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+</FrameLayout>
